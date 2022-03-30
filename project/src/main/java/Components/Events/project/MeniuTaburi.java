@@ -11,15 +11,21 @@ import DataBaseConn.project.DataBaseConn;
 
 import Digitalizare.Laborator.Metrologie.project.DLMAppStart;
 
+import LayOutManager.project.Cell;
+
 import SIL.project.SIL;
 import SIL.project.SILDAO;
 
 import Users.project.UsersDAO;
 
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Font;
-import java.awt.Image;
+import LayOutManager.project.Coord;
+import LayOutManager.project.LineStyle;
+import LayOutManager.project.LogicalPage;
+import LayOutManager.project.PdfLayoutMgr;
+import LayOutManager.project.TableBuilder;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -56,6 +62,25 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import com.spire.pdf.*;
+import com.spire.pdf.automaticfields.PdfAutomaticField;
+import com.spire.pdf.automaticfields.PdfCompositeField;
+import com.spire.pdf.automaticfields.PdfPageCountField;
+import com.spire.pdf.automaticfields.PdfPageNumberField;
+import com.spire.pdf.graphics.*;
+import com.spire.pdf.tables.*;
+import com.sun.xml.internal.stream.writers.UTF8OutputStreamWriter;
+
+import java.awt.geom.Dimension2D;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDFontLike;
+import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 /**
  *
@@ -72,20 +97,20 @@ public class MeniuTaburi extends javax.swing.JPanel {
     FisierDAO fisierManagement = new FisierDAO(db.getConnection());
     FisierSingleDAO fisierSingleManagement = new FisierSingleDAO(db.getConnection());
     
-    List<FisierSingle> fisiereSingle;
-    List<String> listaFisiereGenCom;
-    List<String>listaFisiereModCom;
-    List<String> listaFisiereMapa;
-    List<File> dosarGenCom;
-    List<File> dosarModCom;
-    List<String> arrUti;
+    List<FisierSingle> fisiereSingle = new ArrayList<>();
+    List<String> listaFisiereGenCom = new ArrayList<>();
+    List<String>listaFisiereModCom = new ArrayList<>();
+    List<String> listaFisiereMapa = new ArrayList<>();
+    List<File> dosarGenCom = new ArrayList<>();
+    List<File> dosarModCom = new ArrayList<>();
+    List<String> arrUti = new ArrayList<>();
     
-    String[] numeUti;
-    String[] selectUti;
-    String[] arrayFisiereGenCom;
-    String[] arrayFisiereModCom;
-    String[] listFolders;
-    String[] arrayFisiere;
+    String[] numeUti = {};
+    String[] selectUti = {};
+    String[] arrayFisiereGenCom = {};
+    String[] arrayFisiereModCom = {};
+    String[] listFolders = {};
+    String[] arrayFisiere = {};
     
     String fisiereDLM = "C:\\Oracle\\Middleware\\Oracle_Home\\jdeveloper\\mywork\\mywork\\" + 
                         "DigitalizareLaboratorMetrologie\\project\\FisiereDLM\\";
@@ -147,7 +172,8 @@ public class MeniuTaburi extends javax.swing.JPanel {
         jFileChooserGenCom = new javax.swing.JFileChooser();
         jLabelTipGenCom = new javax.swing.JLabel();
         jTextFieldTipGenCom = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        jLabelFisiereGenCom = new javax.swing.JLabel();
+        jBtnNextStep = new javax.swing.JButton();
         jPanelStergeUti = new javax.swing.JPanel();
         jLabelTitluStergeUti = new javax.swing.JLabel();
         jBtnInchideTabStergeUti = new javax.swing.JButton();
@@ -196,7 +222,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
         jLabelNumeAdaugaUti = new javax.swing.JLabel();
         jTextFieldAdaugaNumeUti = new javax.swing.JTextField();
         jCheckBoxParolaComplexa = new javax.swing.JCheckBox();
-        jLabel1 = new javax.swing.JLabel();
+        jLabelSetareParola = new javax.swing.JLabel();
         jTextFieldSetareParola = new javax.swing.JTextField();
         jLabelConfirmareParola = new javax.swing.JLabel();
         jTextFieldConfParola = new javax.swing.JTextField();
@@ -243,11 +269,45 @@ public class MeniuTaburi extends javax.swing.JPanel {
         jBtnScoateModCom = new javax.swing.JButton();
         jBtnCopiazaModCom = new javax.swing.JButton();
         jBtnIncarcaMapa = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
+        jLabelTitluModCom = new javax.swing.JLabel();
         jBtnGolesteSelectie = new javax.swing.JButton();
         jFileChooserAccesFisiere = new javax.swing.JFileChooser();
         jLabelAfisareComModCom = new javax.swing.JLabel();
         jLabelAfisareFisiereModCom = new javax.swing.JLabel();
+        jPanelVerMet = new javax.swing.JPanel();
+        jLabelTitluVerMet = new javax.swing.JLabel();
+        jLabelNr = new javax.swing.JLabel();
+        jTextFieldNrVerMet = new javax.swing.JTextField();
+        jLabelData = new javax.swing.JLabel();
+        jTextFieldDataVerMet = new javax.swing.JTextField();
+        jLabelNumeSolicitant = new javax.swing.JLabel();
+        jTextFieldNumeSolicitant = new javax.swing.JTextField();
+        jLabelAdresa = new javax.swing.JLabel();
+        jTextFieldAdresa = new javax.swing.JTextField();
+        jLabelCodFiscal = new javax.swing.JLabel();
+        jTextFieldCodFiscal = new javax.swing.JTextField();
+        jLabelIBAN = new javax.swing.JLabel();
+        jTextFieldIBAN = new javax.swing.JTextField();
+        jLabelPersoanaContact = new javax.swing.JLabel();
+        jTextFieldPersoanaContact = new javax.swing.JTextField();
+        jLabelNrOV = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jTableVerMet = new javax.swing.JTable();
+        jLabelTensiuneMedie = new javax.swing.JLabel();
+        jLabelBucTensiuneMedie = new javax.swing.JLabel();
+        jTextFieldBucTensiuneMedie = new javax.swing.JTextField();
+        jLabelTensiuneMedieTensiune = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jTextFieldBucTensiuneMedieTensiune = new javax.swing.JTextField();
+        jLabelJoasaTensiune = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jTextFieldBucJoasaTensiune = new javax.swing.JTextField();
+        jLabelTensiuneJoasaTensiune = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jTextFieldBucTensiuneJoasaTensiune = new javax.swing.JTextField();
+        jLabelAverstismenteVerMet = new javax.swing.JLabel();
+        jBtnInchideTabVerMet = new javax.swing.JButton();
+        jBtnSalvareVerMet = new javax.swing.JButton();
 
         jTabbedPaneMeniu.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
         jTabbedPaneMeniu.setMinimumSize(new java.awt.Dimension(1320, 940));
@@ -530,8 +590,16 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
         jTextFieldTipGenCom.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
-        jLabel2.setText("Fisiere:");
+        jLabelFisiereGenCom.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelFisiereGenCom.setText("Fisiere:");
+
+        jBtnNextStep.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jBtnNextStep.setText("Pasul urmator =>");
+        jBtnNextStep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnNextStepActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelComandaNouaLayout = new javax.swing.GroupLayout(jPanelComandaNoua);
         jPanelComandaNoua.setLayout(jPanelComandaNouaLayout);
@@ -545,25 +613,28 @@ public class MeniuTaburi extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
                         .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
-                                    .addGap(7, 7, 7)
-                                    .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jLabelNumeComNoua)
-                                        .addComponent(jLabelTipGenCom)
-                                        .addComponent(jLabelDescComNoua))
-                                    .addGap(0, 7, Short.MAX_VALUE))
-                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addComponent(jBtnFinalizareCom)
-                            .addComponent(jBtnGenComNoua, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane3)
-                                .addComponent(jTextFieldNumeComNoua, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jTextFieldTipGenCom, javax.swing.GroupLayout.Alignment.LEADING))
-                            .addComponent(jBtnAdaugaFisierComNoua, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
+                                .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
+                                            .addGap(7, 7, 7)
+                                            .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addComponent(jLabelNumeComNoua)
+                                                .addComponent(jLabelTipGenCom)
+                                                .addComponent(jLabelDescComNoua))
+                                            .addGap(7, 7, 7))
+                                        .addComponent(jLabelFisiereGenCom, javax.swing.GroupLayout.Alignment.TRAILING))
+                                    .addComponent(jBtnFinalizareCom, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jBtnGenComNoua, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane3)
+                                        .addComponent(jTextFieldNumeComNoua, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jTextFieldTipGenCom, javax.swing.GroupLayout.Alignment.LEADING))
+                                    .addComponent(jBtnAdaugaFisierComNoua, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jBtnNextStep, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jFileChooserGenCom, javax.swing.GroupLayout.DEFAULT_SIZE, 614, Short.MAX_VALUE)
@@ -599,21 +670,22 @@ public class MeniuTaburi extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
-                        .addComponent(jFileChooserGenCom, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(jFileChooserGenCom, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(jBtnInchideMeniuComNoua, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                        .addComponent(jBtnInchideMeniuComNoua, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
                         .addGap(12, 12, 12)
                         .addGroup(jPanelComandaNouaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(jPanelComandaNouaLayout.createSequentialGroup()
-                                .addComponent(jLabel2)
+                                .addComponent(jLabelFisiereGenCom)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jBtnFinalizareCom, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(jBtnAdaugaFisierComNoua, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 202, Short.MAX_VALUE))))
+                        .addGap(122, 122, 122)
+                        .addComponent(jBtnNextStep, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         jTabbedPaneMeniu.addTab("Generare comanda", jPanelComandaNoua);
@@ -975,12 +1047,12 @@ public class MeniuTaburi extends javax.swing.JPanel {
                         .addComponent(jLabelTitluAdmUti)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelMeniuUtiLayout.createSequentialGroup()
-                        .addGroup(jPanelMeniuUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBtnTabStergereUti, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jBtnAfisareUti, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jBtnTabResetareParola, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jBtnTabAdaugareUti, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabelLogoAdmUti, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanelMeniuUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jBtnTabStergereUti, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                            .addComponent(jBtnAfisareUti, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                            .addComponent(jBtnTabResetareParola, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                            .addComponent(jBtnTabAdaugareUti, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                            .addComponent(jLabelLogoAdmUti, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanelMeniuUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
@@ -1037,8 +1109,8 @@ public class MeniuTaburi extends javax.swing.JPanel {
         jCheckBoxParolaComplexa.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
         jCheckBoxParolaComplexa.setText("Parola complexa");
 
-        jLabel1.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
-        jLabel1.setText("Setare parola:");
+        jLabelSetareParola.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelSetareParola.setText("Setare parola:");
 
         jTextFieldSetareParola.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
 
@@ -1085,7 +1157,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
                                 .addGroup(jPanelAdaugareUtiLayout.createSequentialGroup()
                                     .addGap(100, 100, 100)
                                     .addGroup(jPanelAdaugareUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabelSetareParola, javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(jLabelNumeAdaugaUti, javax.swing.GroupLayout.Alignment.TRAILING))
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addGroup(jPanelAdaugareUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1111,7 +1183,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
                     .addComponent(jTextFieldAdaugaNumeUti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelAdaugareUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(jLabelSetareParola)
                     .addComponent(jTextFieldSetareParola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelAdaugareUtiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1311,8 +1383,8 @@ public class MeniuTaburi extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addGroup(jPanelVizComLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelVizComLayout.createSequentialGroup()
-                                .addComponent(jLabelAvertismenteVizCom, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelAvertismenteVizCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jBtnInchideTabVizCom, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jFileChooserVizCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
@@ -1422,8 +1494,8 @@ public class MeniuTaburi extends javax.swing.JPanel {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("DialogInput", 1, 48)); // NOI18N
-        jLabel3.setText("Moficare comenzi laborator metrologie");
+        jLabelTitluModCom.setFont(new java.awt.Font("DialogInput", 1, 48)); // NOI18N
+        jLabelTitluModCom.setText("Moficare comenzi laborator metrologie");
 
         jBtnGolesteSelectie.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
         jBtnGolesteSelectie.setText("Goleste");
@@ -1449,7 +1521,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanelModComLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelModComLayout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                        .addComponent(jLabelTitluModCom)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelModComLayout.createSequentialGroup()
                         .addGroup(jPanelModComLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -1500,7 +1572,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
             jPanelModComLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelModComLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel3)
+                .addComponent(jLabelTitluModCom)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelModComLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelModComLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1545,12 +1617,278 @@ public class MeniuTaburi extends javax.swing.JPanel {
                                     .addComponent(jBtnScoateModCom, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jBtnCopiazaModCom, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jBtnIncarcaMapa, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(27, 27, 27)
-                        .addComponent(jLabelAvertismenteModCom, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                        .addComponent(jLabelAvertismenteModCom, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
         jTabbedPaneMeniu.addTab("Modificare comanda", jPanelModCom);
+
+        jPanelVerMet.setPreferredSize(new java.awt.Dimension(1080, 680));
+
+        jLabelTitluVerMet.setFont(new java.awt.Font("DialogInput", 1, 48)); // NOI18N
+        jLabelTitluVerMet.setText("Comanda de verificare metrologica");
+
+        jLabelNr.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelNr.setText("Numar:");
+
+        jTextFieldNrVerMet.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelData.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelData.setText("Data:");
+
+        jTextFieldDataVerMet.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelNumeSolicitant.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelNumeSolicitant.setText("Denumire solicitant:");
+
+        jTextFieldNumeSolicitant.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelAdresa.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelAdresa.setText("Adresa:");
+
+        jTextFieldAdresa.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelCodFiscal.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelCodFiscal.setText("Cod Fiscal:");
+
+        jTextFieldCodFiscal.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelIBAN.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelIBAN.setText("Cod IBAN banca:");
+
+        jTextFieldIBAN.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelPersoanaContact.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelPersoanaContact.setText("Persoana contact:");
+
+        jTextFieldPersoanaContact.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+
+        jLabelNrOV.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelNrOV.setText("Denumire / Nr. O.V.");
+
+        jTableVerMet.setFont(new java.awt.Font("DialogInput", 1, 10)); // NOI18N
+        jTableVerMet.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Tip / Caracteristici tehnice", "Producator", "Serii / An fabricatie", "Nr. aprobare model"
+            }
+        ));
+        jTableVerMet.setRowHeight(90);
+        jTableVerMet.getTableHeader().setReorderingAllowed(false);
+        jScrollPane8.setViewportView(jTableVerMet);
+        if (jTableVerMet.getColumnModel().getColumnCount() > 0) {
+            jTableVerMet.getColumnModel().getColumn(0).setHeaderValue("Tip / Caracteristici tehnice");
+            jTableVerMet.getColumnModel().getColumn(1).setHeaderValue("Producator");
+            jTableVerMet.getColumnModel().getColumn(2).setHeaderValue("Serii / An fabricatie");
+            jTableVerMet.getColumnModel().getColumn(3).setHeaderValue("Nr. aprobare model");
+        }
+
+        jLabelTensiuneMedie.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabelTensiuneMedie.setText("Curent medie tensiune");
+
+        jLabelBucTensiuneMedie.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabelBucTensiuneMedie.setText("Nr. buc:");
+
+        jTextFieldBucTensiuneMedie.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+
+        jLabelTensiuneMedieTensiune.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabelTensiuneMedieTensiune.setText("Tensiune medie tensiune");
+
+        jLabel1.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabel1.setText("Nr. buc:");
+
+        jTextFieldBucTensiuneMedieTensiune.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+
+        jLabelJoasaTensiune.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabelJoasaTensiune.setText("Curent joasa tensiune");
+
+        jLabel2.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabel2.setText("Nr. buc:");
+
+        jTextFieldBucJoasaTensiune.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+
+        jLabelTensiuneJoasaTensiune.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabelTensiuneJoasaTensiune.setText("Tensiune joasa tensiune");
+
+        jLabel3.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+        jLabel3.setText("Nr. buc:");
+
+        jTextFieldBucTensiuneJoasaTensiune.setFont(new java.awt.Font("DialogInput", 1, 24)); // NOI18N
+
+        jLabelAverstismenteVerMet.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabelAverstismenteVerMet.setForeground(new java.awt.Color(255, 0, 0));
+
+        jBtnInchideTabVerMet.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jBtnInchideTabVerMet.setText("Inchide");
+        jBtnInchideTabVerMet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnInchideTabVerMetActionPerformed(evt);
+            }
+        });
+
+        jBtnSalvareVerMet.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jBtnSalvareVerMet.setText("Salveaza");
+        jBtnSalvareVerMet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSalvareVerMetActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelVerMetLayout = new javax.swing.GroupLayout(jPanelVerMet);
+        jPanelVerMet.setLayout(jPanelVerMetLayout);
+        jPanelVerMetLayout.setHorizontalGroup(
+            jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                        .addComponent(jLabelIBAN)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldIBAN))
+                    .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                        .addComponent(jLabelPersoanaContact)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldPersoanaContact))
+                    .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabelCodFiscal)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextFieldCodFiscal))
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabelAdresa)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextFieldAdresa))
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabelNumeSolicitant)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextFieldNumeSolicitant))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelVerMetLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelVerMetLayout.createSequentialGroup()
+                                        .addComponent(jLabelNr)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldNrVerMet, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabelData)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldDataVerMet, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabelTitluVerMet, javax.swing.GroupLayout.Alignment.TRAILING))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabelAverstismenteVerMet, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelVerMetLayout.createSequentialGroup()
+                        .addComponent(jBtnSalvareVerMet, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBtnInchideTabVerMet, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextFieldBucTensiuneJoasaTensiune, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextFieldBucJoasaTensiune, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabelTensiuneJoasaTensiune, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelNrOV)
+                            .addComponent(jLabelTensiuneMedieTensiune)
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextFieldBucTensiuneMedieTensiune, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelVerMetLayout.createSequentialGroup()
+                                    .addComponent(jLabelBucTensiuneMedie)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jTextFieldBucTensiuneMedie, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jLabelTensiuneMedie))
+                            .addComponent(jLabelJoasaTensiune))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 889, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanelVerMetLayout.setVerticalGroup(
+            jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                        .addComponent(jLabelTitluVerMet)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabelNr)
+                            .addComponent(jLabelData)
+                            .addComponent(jTextFieldDataVerMet)
+                            .addComponent(jTextFieldNrVerMet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextFieldNumeSolicitant, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelNumeSolicitant))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextFieldAdresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelAdresa))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextFieldCodFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelCodFiscal)))
+                    .addComponent(jLabelAverstismenteVerMet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelIBAN)
+                    .addComponent(jTextFieldIBAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelPersoanaContact)
+                    .addComponent(jTextFieldPersoanaContact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addComponent(jLabelNrOV)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabelTensiuneMedie)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jTextFieldBucTensiuneMedie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabelBucTensiuneMedie))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabelTensiuneMedieTensiune)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jTextFieldBucTensiuneMedieTensiune))
+                                .addGap(45, 45, 45))
+                            .addGroup(jPanelVerMetLayout.createSequentialGroup()
+                                .addGap(220, 220, 220)
+                                .addComponent(jLabelJoasaTensiune)))
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(jTextFieldBucJoasaTensiune, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabelTensiuneJoasaTensiune)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(jTextFieldBucTensiuneJoasaTensiune)))
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanelVerMetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jBtnInchideTabVerMet, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                    .addComponent(jBtnSalvareVerMet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jTabbedPaneMeniu.addTab("Verificare metrologica", jPanelVerMet);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -1566,13 +1904,11 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideTabAdaugaUtiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideTabAdaugaUtiActionPerformed
         // TODO add your handling code here:
-        jPanelAdaugareUti.disable();
         jTabbedPaneMeniu.remove(jPanelAdaugareUti);
     }//GEN-LAST:event_jBtnInchideTabAdaugaUtiActionPerformed
 
     private void jBtnInchideMeniuComNouaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideMeniuComNouaActionPerformed
         // TODO add your handling code here:
-        jPanelComandaNoua.disable();
         jTabbedPaneMeniu.remove(jPanelComandaNoua);
     }//GEN-LAST:event_jBtnInchideMeniuComNouaActionPerformed
 
@@ -1593,7 +1929,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideMeniuFisiereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideMeniuFisiereActionPerformed
         // TODO add your handling code here:
-        jPanelMeniuFisiere.disable();
         jTabbedPaneMeniu.remove(jPanelMeniuFisiere);
     }//GEN-LAST:event_jBtnInchideMeniuFisiereActionPerformed
 
@@ -1636,7 +1971,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideTabUtiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideTabUtiActionPerformed
         // TODO add your handling code here:
-        jPanelMeniuUti.disable();
         jTabbedPaneMeniu.remove(jPanelMeniuUti);
     }//GEN-LAST:event_jBtnInchideTabUtiActionPerformed
 
@@ -1722,7 +2056,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                             jTabbedPaneMeniu.addTab("Administrare utilizatori", jPanelMeniuUti);
                             ButonInchideTaburi inchide = new ButonInchideTaburi(jTabbedPaneMeniu);
                             jTabbedPaneMeniu.setTabComponentAt(jTabbedPaneMeniu.indexOfComponent(jPanelMeniuUti), inchide);
-                            dialog.disable();
                             dialog.dispose();
                         } else {
                             Font normalFont = new Font("DialogInput", Font.BOLD, 18);
@@ -1735,7 +2068,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                             parola.requestFocusInWindow();
                         }    
                     } else {
-                        dialog.disable();
                         dialog.dispose();    
                     }
                 }
@@ -1752,9 +2084,88 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnTabAdmFisiereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTabAdmFisiereActionPerformed
         // TODO add your handling code here:
-        jTabbedPaneMeniu.addTab("Administrare fisiere", jPanelMeniuFisiere);
-        ButonInchideTaburi inchide = new ButonInchideTaburi(jTabbedPaneMeniu);
-        jTabbedPaneMeniu.setTabComponentAt(jTabbedPaneMeniu.indexOfComponent(jPanelMeniuFisiere), inchide);
+        JPasswordField parola = new JPasswordField();
+        parola.setFont(new Font("DialogInput", Font.BOLD, 18));
+        JCheckBox bifa = new JCheckBox();
+        bifa.setFont(new Font("DialogInput", Font.BOLD, 18));
+        bifa.setText("Afiseaza parola");
+        ActionListener actionListener = new ActionListener() {
+          public void actionPerformed(ActionEvent actionEvent) {
+            if (parola.echoCharIsSet()) {
+                parola.setEchoChar((char) 0);
+            } else {
+                parola.setEchoChar('•');
+            }
+          }
+        };
+        bifa.addActionListener(actionListener);
+        Object [] inputs = {"<html><center>Trebuie sa fii dev, daca doresti<br>sa accesezi administrarea fisierelor!<br>" +
+                            "Stii parola de dev?</center></html>", parola, bifa};
+        Object [] optiuni = {"Acceseaza", "Anuleaza"};
+        UIManager.put("OptionPane.messageForeground", Color.RED);
+        UIManager.put("OptionPane.messageFont", new Font("DialogInput", Font.BOLD, 18));
+        UIManager.put("OptionPane.buttonFont", new Font("DialogInput", Font.BOLD, 18));
+        final JOptionPane panouOptiuni = new JOptionPane(inputs, JOptionPane.WARNING_MESSAGE,
+                                                         JOptionPane.YES_NO_OPTION,
+                                                         null,
+                                                         optiuni,
+                                                         optiuni[0]);
+        final JDialog dialog = new JDialog(DLMAppStart.appStart, 
+                                           "Confirmare:",
+                                           true);
+        dialog.setContentPane(panouOptiuni);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent ce) {
+                parola.requestFocusInWindow();
+            }
+        });
+        panouOptiuni.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent ev) {
+                String proprietate = ev.getPropertyName();
+                if (dialog.isVisible() && ev.getSource() == panouOptiuni
+                    && proprietate.equals(JOptionPane.VALUE_PROPERTY)
+                    || proprietate.equals(JOptionPane.INPUT_VALUE_PROPERTY)){
+                    panouOptiuni.setInputValue(JOptionPane.YES_NO_OPTION);
+                    Object valoare = panouOptiuni.getValue();
+                    if (valoare == JOptionPane.UNINITIALIZED_VALUE) {
+                        return;
+                    }
+                    panouOptiuni.setValue(JOptionPane.UNINITIALIZED_VALUE);
+                    if ("Acceseaza".equals(valoare)) {
+                        UsersDAO userManagement = new UsersDAO(db.getConnection());
+                        Map<String, String> listaUti = new HashMap<>();
+                        try {
+                             listaUti = userManagement.getAll();
+                        } catch (SQLException ex) {
+                             java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                        }
+                        String getParola = listaUti.get("Dev");
+                        if (!parola.getText().isEmpty() && parola.getText().equals(getParola)) {
+                            jTabbedPaneMeniu.addTab("Administrare fisiere", jPanelMeniuFisiere);
+                            ButonInchideTaburi inchide = new ButonInchideTaburi(jTabbedPaneMeniu);
+                            jTabbedPaneMeniu.setTabComponentAt(jTabbedPaneMeniu.indexOfComponent(jPanelMeniuFisiere), inchide);
+                            dialog.dispose();
+                        } else {
+                            Font normalFont = new Font("DialogInput", Font.BOLD, 18);
+                            UIManager.put("OptionPane.messageForeground", Color.red);
+                            UIManager.put("OptionPane.font", normalFont);
+                            JOptionPane.showMessageDialog(DLMAppStart.appStart,
+                                                          "<html><center>Daca nu esti dev...<br>" +
+                                                          "Dispari!</center></html>",
+                                                          "Eroare:", JOptionPane.ERROR_MESSAGE);
+                            parola.requestFocusInWindow();
+                        }    
+                    } else {
+                        dialog.dispose();    
+                    }
+                }
+            }
+        });
+        dialog.pack();
+        dialog.setLocationRelativeTo(DLMAppStart.appStart);
+        dialog.setVisible(true);
     }//GEN-LAST:event_jBtnTabAdmFisiereActionPerformed
 
     private void jBtnTabVizComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTabVizComActionPerformed
@@ -1936,7 +2347,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideAdaugareFisiereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideAdaugareFisiereActionPerformed
         // TODO add your handling code here:
-        jPanelAdaugaFisiere.disable();
         jTabbedPaneMeniu.remove(jPanelAdaugaFisiere);
     }//GEN-LAST:event_jBtnInchideAdaugareFisiereActionPerformed
 
@@ -1966,8 +2376,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                 }
                 if (temp != null) {
                     jLabelAvertizareAdaugareFisiere.setText("<html><center>Fisierul a<br> fost salvat!</center><html/>");
-                } else {
-                    jLabelAvertizareAdaugareFisiere.setText("<html><center>Fisierul nu<br> s-a putut salva!</center><html/>");
                 }
             } else {
                 jLabelAvertizareAdaugareFisiere.setText("<html><center>Toate campurile<br> trebuiesc completate!</center><html/>");
@@ -2006,7 +2414,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideStergereFisiereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideStergereFisiereActionPerformed
         // TODO add your handling code here:
-        jPanelStergereFisiere.disable();
         jTabbedPaneMeniu.remove(jPanelStergereFisiere);
     }//GEN-LAST:event_jBtnInchideStergereFisiereActionPerformed
 
@@ -2019,13 +2426,11 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideTabStergeUtiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideTabStergeUtiActionPerformed
         // TODO add your handling code here:
-        jPanelStergeUti.disable();
         jTabbedPaneMeniu.remove(jPanelStergeUti);
     }//GEN-LAST:event_jBtnInchideTabStergeUtiActionPerformed
 
     private void jBtnInchideResetParoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideResetParoleActionPerformed
         // TODO add your handling code here:
-        jPanelResetParolaUti.disable();
         jTabbedPaneMeniu.remove(jPanelResetParolaUti);
     }//GEN-LAST:event_jBtnInchideResetParoleActionPerformed
 
@@ -2152,7 +2557,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideTabVizComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideTabVizComActionPerformed
         // TODO add your handling code here:
-        jPanelVizCom.disable();
         jTabbedPaneMeniu.remove(jPanelVizCom);
     }//GEN-LAST:event_jBtnInchideTabVizComActionPerformed
 
@@ -2227,7 +2631,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                                         SILmag.stergeDupaNume(stergeSIL.getNume());
                                         delete(jFileChooserVizCom.getSelectedFile());
                                         jFileChooserVizCom.rescanCurrentDirectory();
-                                        jFileChooserVizCom.revalidate();
                                         jLabelAvertismenteVizCom.setText("<html><center>Comanda " + stergeSIL.getNume() + " a fost stearsa!</center><html/>");
                                     } catch(NullPointerException ex) {
                                         jLabelAvertismenteVizCom.setText("<html><center>"+jFileChooserVizCom.getSelectedFile().getName().toString()+"Trebuie sa alegi un fisier!</center></html>");
@@ -2242,7 +2645,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                             } catch (SQLException ex) {
                                 java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
                             }
-                            dialog.disable();
                             dialog.dispose();
                         } else {
                             Font normalFont = new Font("DialogInput", Font.BOLD, 18);
@@ -2255,7 +2657,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                             parola.requestFocusInWindow();
                         }    
                     } else {
-                        dialog.disable();
                         dialog.dispose();    
                     }
                 }
@@ -2330,7 +2731,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                             jTabbedPaneMeniu.addTab("Modificare comanda", jPanelModCom);
                             ButonInchideTaburi inchide = new ButonInchideTaburi(jTabbedPaneMeniu);
                             jTabbedPaneMeniu.setTabComponentAt(jTabbedPaneMeniu.indexOfComponent(jPanelModCom), inchide);
-                            dialog.disable();
                             dialog.dispose();
                         } else {
                             Font normalFont = new Font("DialogInput", Font.BOLD, 18);
@@ -2343,7 +2743,6 @@ public class MeniuTaburi extends javax.swing.JPanel {
                             parola.requestFocusInWindow();
                         }    
                     } else {
-                        dialog.disable();
                         dialog.dispose();    
                     }
                 }
@@ -2356,8 +2755,9 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnInchideTabModComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideTabModComActionPerformed
         // TODO add your handling code here:
-        jPanelModCom.disable();
         jTabbedPaneMeniu.remove(jPanelModCom);
+        listaFisiereModCom.clear();
+        listaFisiereMapa.clear();
     }//GEN-LAST:event_jBtnInchideTabModComActionPerformed
 
     private void jBtnSelectModComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSelectModComActionPerformed
@@ -2386,7 +2786,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
                         public String getElementAt(int i) { return strings[i]; }
                     });
                     dosarModCom.add(new File(jFileChooserModCom.getSelectedFile().getPath()));
-                    jFileChooserModCom.rescanCurrentDirectory();
+                    jFileChooserModCom.setCurrentDirectory(locatieMapa);
                 }  catch (SQLException ex) {
                     java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
                 }
@@ -2420,38 +2820,22 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private void jBtnModificareComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnModificareComActionPerformed
         // TODO add your handling code here:
         try {
-            if (jFileChooserModCom.getSelectedFile().getAbsolutePath().toString().startsWith(siluriNoi)
-                && jFileChooserModCom.getSelectedFile().isDirectory()) {
-                try {
-                    SIL modificaSIL = SILmag.getSilDupaNume(jFileChooserModCom.getSelectedFile().getName().toString());
-                    jTextFieldNumeModCom.getText();
-                    jTextFieldTipModCom.getText();
-                    jTextAreaDescModCom.getText();
-                    File locatieMapa = jFileChooserModCom.getSelectedFile();
-                    File[] arrayFisiere = locatieMapa.listFiles();
-                    for(File f : arrayFisiere){
-                        listaFisiereModCom.add(f.getName());
-                    }
-                    arrayFisiereModCom = new String[listaFisiereModCom.size()];
-                    for(int i = 0; i < listaFisiereModCom.size(); i++){
-                        arrayFisiereModCom[i] = listaFisiereModCom.get(i);
-                    }
-                    Arrays.sort(arrayFisiereModCom);
-                    jListModCom.setModel(new javax.swing.AbstractListModel<String>() {
-                        String[] strings = arrayFisiereModCom;
-                        public int getSize() { return strings.length; }
-                        public String getElementAt(int i) { return strings[i]; }
-                    });
-                    dosarModCom.add(new File(jFileChooserModCom.getSelectedFile().getPath()));
+            SIL modificaSIL = SILmag.getSilDupaNume(jFileChooserModCom.getSelectedFile().getName().toString());
+            if (jFileChooserModCom.getCurrentDirectory().getAbsolutePath().toString().startsWith(siluriNoi)
+                && jFileChooserModCom.getSelectedFile().equals(modificaSIL)) {
+                    modificaSIL.setNume(jTextFieldNumeModCom.getText());
+                    modificaSIL.setTip(jTextFieldTipModCom.getText());
+                    modificaSIL.setDescriere(jTextAreaDescModCom.getText());
+                    SILmag.update(modificaSIL);
+                    jLabelAvertismenteModCom.setText("<html><center>Comanda " + modificaSIL.getNume() + " a fost modificata cu succes!</center><html/>");
                     jFileChooserModCom.rescanCurrentDirectory();
-                }  catch (SQLException ex) {
-                    java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                }
             } else {
                 jLabelAvertismenteModCom.setText("<html><center>Comenzile set pot modifica doar<br> din locatia la care ai access!</center></html>");
              }
         } catch(NullPointerException ex) {
             jLabelAvertismenteModCom.setText("<html><center>Trebuie sa selectezi o comanda!</center></html>");
+        } catch (SQLException ex) {
+            java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jBtnModificareComActionPerformed
 
@@ -2499,8 +2883,9 @@ public class MeniuTaburi extends javax.swing.JPanel {
 
     private void jBtnIncarcaMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIncarcaMapaActionPerformed
         // TODO add your handling code here:
-        if (jFileChooserModCom.getSelectedFile().isDirectory()) {
-            try {
+        try {
+            listaFisiereMapa.clear();
+            if (jFileChooserModCom.getSelectedFile().isDirectory()) {
                 File mapa = jFileChooserModCom.getSelectedFile();
                 File[] arrayFisiereMapa = mapa.listFiles();
                 for(File f : arrayFisiereMapa){
@@ -2516,32 +2901,71 @@ public class MeniuTaburi extends javax.swing.JPanel {
                     public int getSize() { return strings.length; }
                     public String getElementAt(int i) { return strings[i]; }
                 });
-                Desktop.getDesktop().open(jFileChooserModCom.getSelectedFile());
-                jFileChooserModCom.rescanCurrentDirectory();
-            } catch(NullPointerException ex) {
-                jLabelAvertismenteModCom.setText("<html><center>Nu ai ales<br> nici o mapa!</center><html/>");
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                jFileChooserModCom.setCurrentDirectory(mapa);
             }
+        } catch(NullPointerException ex) {
+            jLabelAvertismenteModCom.setText("<html><center>Trebuie sa si alegi o mapa daca<br> doresti sa-i vizualizezi continutul!</center><html/>");
         }
     }//GEN-LAST:event_jBtnIncarcaMapaActionPerformed
 
     private void jBtnCopiazaModComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCopiazaModComActionPerformed
         // TODO add your handling code here:
         try {
-            if (jFileChooserAccesFisiere.getSelectedFile().isFile()) {
+            if (jFileChooserAccesFisiere.getSelectedFile().exists() &&
+                jFileChooserModCom.getCurrentDirectory().equals(
+                SILmag.getSilDupaNume(jFileChooserModCom.getSelectedFile().getName().toString()))) {
                 try {
-                    File selectie = jFileChooserAccesFisiere.getSelectedFile();
-                    File[] fisiere = selectie.listFiles();
-                    for(File f : fisiere){
-                        listaFisiereMapa.add(f.getName());
+                    Files.copy(Paths.get(jFileChooserAccesFisiere.getSelectedFile()
+                                                                 .getAbsolutePath().toString()),
+                               Paths.get(jFileChooserModCom.getCurrentDirectory()
+                                                           .getAbsolutePath().toString()
+                                         + "\\" + jFileChooserAccesFisiere.getSelectedFile()
+                                                                          .getName().toString()));
+                    listaFisiereModCom.add(jFileChooserAccesFisiere.getSelectedFile().getName());
+                    arrayFisiereModCom = new String[listaFisiereMapa.size()];
+                    for(int i = 0; i < listaFisiereModCom.size(); i++){
+                        arrayFisiereModCom[i] = listaFisiereModCom.get(i);
                     }
-                    Files.copy(Paths.get(jFileChooserAccesFisiere.getSelectedFile().toString()),
-                                         jFileChooserModCom.getCurrentDirectory().toPath());
+                    Arrays.sort(arrayFisiereModCom);
+                    jListModCom.setModel(new javax.swing.AbstractListModel<String>() {
+                        String[] strings = arrayFisiereModCom;
+                        public int getSize() { return strings.length; }
+                        public String getElementAt(int i) { return strings[i]; }
+                    });
+                    jFileChooserModCom.rescanCurrentDirectory();
                 } catch (IOException ex) {
                     java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
                 }
+            } else if(jFileChooserAccesFisiere.getSelectedFile().exists() &&
+                !jFileChooserModCom.getCurrentDirectory().equals(
+                SILmag.getSilDupaNume(jFileChooserModCom.getSelectedFile().getName().toString()))) {
+                try {
+                    Files.copy(Paths.get(jFileChooserAccesFisiere.getSelectedFile()
+                                                                 .getAbsolutePath()
+                                                                 .toString()),
+                               Paths.get(jFileChooserModCom.getCurrentDirectory()
+                                                                .getAbsolutePath()
+                                                                .toString() +
+                                         "\\" + jFileChooserAccesFisiere.getSelectedFile()
+                                                                        .getName()
+                                                                        .toString()));
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
+                listaFisiereMapa.add(jFileChooserAccesFisiere.getSelectedFile().getName());
+                arrayFisiere = new String[listaFisiereMapa.size()];
+                for(int i = 0; i < listaFisiereMapa.size(); i++){
+                    arrayFisiere[i] = listaFisiereMapa.get(i);
+                }
+                Arrays.sort(arrayFisiere);
+                jListModCom.setModel(new javax.swing.AbstractListModel<String>() {
+                    String[] strings = arrayFisiere;
+                    public int getSize() { return strings.length; }
+                    public String getElementAt(int i) { return strings[i]; }
+                });
             }
+        } catch (SQLException ex) {
+            java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch(NullPointerException ex) {
             jLabelAvertismenteModCom.setText("<html><center>Nu ai ales<br> nici un fisier!</center><html/>");
         }
@@ -2565,18 +2989,284 @@ public class MeniuTaburi extends javax.swing.JPanel {
                     null,     //do not use a custom Icon
                     selectie,  //the titles of buttons
                     selectie[0]); //default button title
-                if (optiune == JOptionPane.YES_OPTION) {
-                    try {
-                        Files.delete(Paths.get(jFileChooserModCom.getSelectedFile().toString()));
-                    } catch (IOException ex) {
-                        java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                try {
+                    if (optiune == JOptionPane.YES_OPTION &&
+                        jFileChooserModCom.getCurrentDirectory()
+                                          .equals(SILmag.getSilDupaNume(jFileChooserModCom.getSelectedFile()
+                                                                                          .getName()
+                                                                                          .toString()))) {
+                        try {
+                            Files.delete(Paths.get(jFileChooserModCom.getSelectedFile().toString()));
+                            jFileChooserModCom.rescanCurrentDirectory();
+                            listaFisiereModCom.remove(jFileChooserModCom.getSelectedFile().getName());
+                            arrayFisiereModCom = new String[listaFisiereModCom.size()];
+                            for (int i = 0; i < listaFisiereModCom.size(); i++) {
+                                arrayFisiereModCom[i] = listaFisiereModCom.get(i);
+                            }
+                            Arrays.sort(arrayFisiereModCom);
+                            jListModCom.setModel(new javax.swing.AbstractListModel<String>() {
+                                String[] strings = arrayFisiereModCom;
+                                public int getSize() {return strings.length;}
+                                public String getElementAt(int i) {return strings[i];}
+                            });
+                        } catch (IOException ex) {
+                            java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                        }
+                    } else if(optiune == JOptionPane.YES_OPTION &&
+                              !jFileChooserModCom.getCurrentDirectory()
+                                                 .equals(SILmag.getSilDupaNume(jFileChooserModCom
+                                                                               .getSelectedFile()
+                                                                               .getName()
+                                                                               .toString()))) {
+                        try {
+                            Files.delete(Paths.get(jFileChooserModCom.getSelectedFile().toString()));
+                            jFileChooserModCom.rescanCurrentDirectory();
+                            listaFisiereMapa.remove(jFileChooserModCom.getSelectedFile().getName());
+                            arrayFisiere = new String[listaFisiereMapa.size()];
+                            for (int i = 0; i < listaFisiereMapa.size(); i++) {
+                                arrayFisiere[i] = listaFisiereMapa.get(i);
+                            }
+                            Arrays.sort(arrayFisiere);
+                            jListModCom.setModel(new javax.swing.AbstractListModel<String>() {
+                                String[] strings = arrayFisiere;
+                                public int getSize() {return strings.length;}
+                                public String getElementAt(int i) {return strings[i];}
+                            });
+                        } catch (IOException ex) {
+                            java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                        }
                     }
+                } catch (SQLException ex) {
+                    java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
                 }
             }
         } catch(NullPointerException ex) {
-            jLabelAvertismenteModCom.setText("<html><center>Nu ai ales<br> nici un fisier!</center><html/>");
+            jLabelAvertismenteModCom.setText("<html><center>Ca sa poti sterge ceva,<br> mai intai trebuie sa-l si selectezi!</center><html/>");
         }
     }//GEN-LAST:event_jBtnScoateModComActionPerformed
+
+    private void jBtnNextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNextStepActionPerformed
+        // TODO add your handling code here:
+        jTabbedPaneMeniu.addTab("Verificare metrologica", jPanelVerMet);
+        ButonInchideTaburi inchide = new ButonInchideTaburi(jTabbedPaneMeniu);
+        jTabbedPaneMeniu.setTabComponentAt(jTabbedPaneMeniu.indexOfComponent(jPanelVerMet), inchide);
+    }//GEN-LAST:event_jBtnNextStepActionPerformed
+
+    private void jBtnInchideTabVerMetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnInchideTabVerMetActionPerformed
+        // TODO add your handling code here:
+        jTabbedPaneMeniu.remove(jPanelVerMet);
+    }//GEN-LAST:event_jBtnInchideTabVerMetActionPerformed
+
+    private void jBtnSalvareVerMetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSalvareVerMetActionPerformed
+        // TODO add your handling code here:
+        PDDocument document = new PDDocument();
+        try {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            PDFont font = PDType1Font.HELVETICA_BOLD;
+            //PDFontLike font = PDType0Font.load(document, new File("C:\\Users\\Dragos\\Desktop\\arial.TTF"));
+            PDPageContentStream contents = new PDPageContentStream(document, page);
+            contents.beginText();
+            contents.setFont(font, 14);
+            /*String NrSiData = "S.C. Necom S.R.L.\n" +
+                              "Laborator Metrologie\n\n" +
+                              "                          Comanda verificare metrologica\n" +
+                              "                                 Nr: " + jTextFieldNrVerMet.getText()+ " Data: " +
+                              jTextFieldDataVerMet.getText(); */
+            contents.setLeading(14.5f);
+            contents.newLineAtOffset(50, 500);
+            contents.showText("S.C. Necom S.R.L");
+            contents.newLine();
+            contents.showText("Laborator Metrologie");
+            contents.newLine();
+            contents.newLine();
+            contents.showText("                           Comanda verificare metrologica");
+            contents.newLine();
+            contents.showText("                                Nr:"+jTextFieldNrVerMet.getText()+" Data: " + jTextFieldDataVerMet.getText());
+            contents.newLine();
+            contents.newLine(); 
+            String[] data = {"Denumire solicitant;" + jTextFieldNumeSolicitant.getText(), "Date identificare;" + "Adresa: " +
+                             jTextFieldAdresa.getText() + "\nCod fiscal: " + jTextFieldCodFiscal.getText() + "\nCod IBAN: " +
+                             jTextFieldIBAN.getText(), "Persoana contact / Telefon;" + jTextFieldPersoanaContact.getText()};
+            
+            String[][] dataSource = new String[data.length][];
+            for (int i = 0; i < data.length; i++) {
+                dataSource[i] = data[i].split("[;]", -1);
+            }   
+            Coord coordinate = new Coord(10, 700);
+            PdfLayoutMgr pageMgr = PdfLayoutMgr.newRgbPageMgr();
+            LogicalPage locatieTabel = pageMgr.logicalPageStart();
+            TableBuilder tabel = TableBuilder.of(locatieTabel, coordinate);
+            float margin = 50;
+            // starting y position is whole page height subtracted by top and bottom margin
+            float yStartNewPage = page.getMediaBox().getHeight() - (2 * margin);
+            // we want table across whole page width (subtracted by left and right margin ofcourse)
+            float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
+
+            boolean drawContent = true;
+            float yStart = yStartNewPage;
+            float bottomMargin = 70;
+            // y position is your coordinate of top left corner of the table
+            float yPosition = 550;
+
+            BaseTable table = new BaseTable(yPosition, yStartNewPage,
+                bottomMargin, tableWidth, margin, document, page, true, drawContent);
+
+            // the parameter is the row height
+            Row<PDPage> headerRow = table.createRow(50);
+            // the first parameter is the cell width
+            Cell<PDPage> cell = headerRow.createCell(100, "Header");
+            cell.setFont(fontBold);
+            cell.setFontSize(20);
+            // vertical alignment
+            cell.setValign(VerticalAlignment.MIDDLE);
+            // border style
+            cell.setTopBorderStyle(new LineStyle(Color.BLACK, 10));
+            table.addHeaderRow(headerRow);
+
+            Row<PDPage> row = table.createRow(20);
+            cell = row.createCell(30, "black left plain");
+            cell.setFontSize(15);
+            cell = row.createCell(70, "black left bold");
+            cell.setFontSize(15);
+            cell.setFont(fontBold);
+
+            row = table.createRow(20);
+            cell = row.createCell(50, "red right mono");
+            cell.setTextColor(Color.RED);
+            cell.setFontSize(15);
+            cell.setFont(fontMono);
+            // horizontal alignment
+            cell.setAlign(HorizontalAlignment.RIGHT);
+            cell.setBottomBorderStyle(new LineStyle(Color.RED, 5));
+            cell = row.createCell(50, "green centered italic");
+            cell.setTextColor(Color.GREEN);
+            cell.setFontSize(15);
+            cell.setFont(fontItalic);
+            cell.setAlign(HorizontalAlignment.CENTER);
+            cell.setBottomBorderStyle(new LineStyle(Color.GREEN, 5));
+
+            row = table.createRow(20);
+            cell = row.createCell(40, "rotated");
+            cell.setFontSize(15);
+            // rotate the text
+            cell.setTextRotated(true);
+            cell.setAlign(HorizontalAlignment.RIGHT);
+            cell.setValign(VerticalAlignment.MIDDLE);
+            // long text that wraps
+            cell = row.createCell(30, "long text long text long text long text long text long text long text");
+            cell.setFontSize(12);
+            // long text that wraps, with more line spacing
+            cell = row.createCell(30, "long text long text long text long text long text long text long text");
+            cell.setFontSize(12);
+            cell.setLineSpacing(2);
+
+            table.draw();
+            contents.showText(tabel.buildTable().toString());
+            contents.endText();
+            contents.close();
+            jLabelAverstismenteVerMet.setText("<html><center>Datele au fost salvate cu succes!</center></html>"); 
+            document.save("C:\\Users\\Dragos\\Desktop\\Comanda de verificare metrologica.pdf");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } finally {
+            try {
+                document.close();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+        }
+        /*PdfDocument doc = new PdfDocument();
+        //Set margins
+        PdfMargins margin = new PdfMargins(60,60,40,40);
+        //Call the method addHeaderAndFooter() to add header and footer
+        addHeaderAndFooter(doc, PdfPageSize.A4, margin); 
+        //Add two pages to the PDF document and draw string to it.
+        PdfPageBase page = doc.getPages().add();
+        //PdfPageBase page2 = doc.getPages().add();
+        PdfTrueTypeFont font = new PdfTrueTypeFont(new Font("Arial", Font.PLAIN, 14));
+        String NrSiData = "S.C. Necom S.R.L.\n" +
+                          "Laborator Metrologie\n\n" +
+                          "                          Comanda verificare metrologica\n" +
+                          "                                 Nr: " + jTextFieldNrVerMet.getText()+ " Data: " +
+                          jTextFieldDataVerMet.getText();
+        page.getCanvas().drawString(NrSiData, font, PdfBrushes.getBlack(), 0, 0);  
+        //Creeare primului tabel
+        //Set margins
+        PdfUnitConvertor unitCvtr = new PdfUnitConvertor();
+        margin.setTop(unitCvtr.convertUnits(2.54f, PdfGraphicsUnit.Centimeter, PdfGraphicsUnit.Point));
+        margin.setBottom(margin.getTop());
+        margin.setLeft(unitCvtr.convertUnits(3.17f, PdfGraphicsUnit.Centimeter, PdfGraphicsUnit.Point));
+        margin.setRight(margin.getLeft());
+        //Add one page
+        //page = doc.getPages().add(PdfPageSize.A4, margin);
+        float y = 10;
+        //Draw title
+        PdfBrush brush1 = PdfBrushes.getBlack();
+        PdfTrueTypeFont font1 = new PdfTrueTypeFont(new Font("Arial", Font.BOLD ,16));
+        PdfStringFormat format1 = new PdfStringFormat(PdfTextAlignment.Center);
+        //page.getCanvas().drawString("\n\n\n\n\n"+"Country List", font1, brush1, page.getCanvas().getClientSize().getWidth() / 2, y, format1);
+        //y = y + (float) font1.measureString("Country List", format1).getHeight();
+        y = y + 5; 
+        y = y + (float) font1.measureString(NrSiData, format1).getHeight();
+        y = y + 5;
+        //Data source to create table
+        String[] data = {"Denumire solicitant;" + jTextFieldNumeSolicitant.getText(), "Date identificare;" + "Adresa: " +
+                         jTextFieldAdresa.getText() + "\nCod fiscal: " + jTextFieldCodFiscal.getText() + "\nCod IBAN: " +
+                         jTextFieldIBAN.getText(), "Persoana contact / Telefon;" + jTextFieldPersoanaContact.getText()};
+        String[][] dataSource = new String[data.length][];
+        for (int i = 0; i < data.length; i++) {
+            dataSource[i] = data[i].split("[;]", -1);
+        }
+        //Create a PdfTable instance and set data source
+        PdfTable table = new PdfTable();
+        table.getStyle().setCellPadding(2);
+        table.getStyle().setHeaderSource(PdfHeaderSource.Rows);
+        table.getStyle().setHeaderRowCount(1);
+        table.getStyle().setShowHeader(true);
+        table.setDataSource(dataSource);
+        //Draw table to the page
+        PdfLayoutResult result = table.draw(page, new Point2D.Float(0, y));
+        y = y + (float) result.getBounds().getHeight() + 5;
+        //Creeare tabelului 2
+        String[] data2 = {"Denumirea / Numarul O.V.;Tip / caracteristici tehnice (valori primar / secundar, putere secundar, " +
+                          "clasa precizie);Producator;Serii / an fabricatie;Nr. aprobare model",
+                          "Curent medie tensiune \nNr. buc: " +jTextFieldBucTensiuneMedie.getText() + ";" +
+                          jTableVerMet.getValueAt(0, 0) + ";" + jTableVerMet.getValueAt(0, 1) + ";" +
+                          jTableVerMet.getValueAt(0, 2) + ";" + jTableVerMet.getValueAt(0, 3),
+                          "Tensiune medie tensiune\nNr. buc: " + jTextFieldBucTensiuneMedieTensiune.getText() + 
+                          ";" + jTableVerMet.getValueAt(1, 0) + ";" + jTableVerMet.getValueAt(1, 1) + ";" +
+                          jTableVerMet.getValueAt(1, 2) + ";" + jTableVerMet.getValueAt(1, 3), "Curent joasa\ntensiune\nNr. buc: "
+                          + jTextFieldBucJoasaTensiune.getText() + ";" + jTableVerMet.getValueAt(2, 0) + ";" +
+                          jTableVerMet.getValueAt(2, 1)+";" + jTableVerMet.getValueAt(2, 2) + ";" +
+                          jTableVerMet.getValueAt(2, 3), "Tensiune joasa tensiune\nNr. buc: " +
+                          jTextFieldBucTensiuneJoasaTensiune.getText() + ";" + jTableVerMet.getValueAt(3, 0) +
+                          ";" + jTableVerMet.getValueAt(3, 1) + ";" + jTableVerMet.getValueAt(3, 2) +
+                          ";" + jTableVerMet.getValueAt(3, 3)};
+        String[][] dataSource2 = new String[data2.length][];
+        for (int i = 0; i < data2.length; i++) {
+            dataSource2[i] = data2[i].split("[;]", -1);
+        }
+        //Create a PdfTable instance and set data source
+        PdfTable table2 = new PdfTable();
+        table2.getStyle().setCellPadding(2);
+        table2.getStyle().setHeaderSource(PdfHeaderSource.Rows);
+        table2.getStyle().setHeaderRowCount(1);
+        table2.getStyle().setShowHeader(true);
+        table2.setDataSource(dataSource2);
+        //Draw table to the page
+        PdfLayoutResult result2 = table2.draw(page, new Point2D.Float(0, y));
+        y = y + (float) result2.getBounds().getHeight() + 10;
+        //Draw string below table
+        PdfBrush brush2 = PdfBrushes.getGray();
+        PdfTrueTypeFont font2 = new PdfTrueTypeFont(new Font("Arial", 0,9));
+        page.getCanvas().drawString("Formular cod FL 48.1" + String.format("%" + 75 + "s", "") +
+                                    "Semnatura si stampila solicitant", font2, brush2, 5, y);  // era y cel mai in dreapta
+        //Save the document
+        doc.saveToFile("C:\\Users\\Dragos\\Desktop\\Comanda de verificare metrologica.pdf");
+        doc.close();
+        jLabelAverstismenteVerMet.setText("<html><center>Datele au fost salvate cu succes!</center></html>"); */
+    }//GEN-LAST:event_jBtnSalvareVerMetActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2600,11 +3290,14 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private javax.swing.JButton jBtnInchideTabModCom;
     private javax.swing.JButton jBtnInchideTabStergeUti;
     private javax.swing.JButton jBtnInchideTabUti;
+    private javax.swing.JButton jBtnInchideTabVerMet;
     private javax.swing.JButton jBtnInchideTabVizCom;
     private javax.swing.JButton jBtnModificaCom;
     private javax.swing.JButton jBtnModificareCom;
+    private javax.swing.JButton jBtnNextStep;
     private javax.swing.JButton jBtnResetareParolaUti;
     private javax.swing.JButton jBtnSalvareFisier;
+    private javax.swing.JButton jBtnSalvareVerMet;
     private javax.swing.JButton jBtnScoateModCom;
     private javax.swing.JButton jBtnSelectModCom;
     private javax.swing.JButton jBtnStergeCom;
@@ -2634,21 +3327,29 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabelAdaugareUtiMesaje;
+    private javax.swing.JLabel jLabelAdresa;
     private javax.swing.JLabel jLabelAfisareComModCom;
     private javax.swing.JLabel jLabelAfisareFisiereModCom;
+    private javax.swing.JLabel jLabelAverstismenteVerMet;
     private javax.swing.JLabel jLabelAvertismenteComNoua;
     private javax.swing.JLabel jLabelAvertismenteModCom;
     private javax.swing.JLabel jLabelAvertismenteStergereFisiere;
     private javax.swing.JLabel jLabelAvertismenteVizCom;
     private javax.swing.JLabel jLabelAvertizareAdaugareFisiere;
     private javax.swing.JLabel jLabelAvertizareResetParola;
+    private javax.swing.JLabel jLabelBucTensiuneMedie;
+    private javax.swing.JLabel jLabelCodFiscal;
     private javax.swing.JLabel jLabelConfParolaNoua;
     private javax.swing.JLabel jLabelConfStergeUti;
     private javax.swing.JLabel jLabelConfirmareParola;
+    private javax.swing.JLabel jLabelData;
     private javax.swing.JLabel jLabelDescComNoua;
     private javax.swing.JLabel jLabelDescModCom;
     private javax.swing.JLabel jLabelDescriereFisier;
+    private javax.swing.JLabel jLabelFisiereGenCom;
     private javax.swing.JLabel jLabelFisiereModCom;
+    private javax.swing.JLabel jLabelIBAN;
+    private javax.swing.JLabel jLabelJoasaTensiune;
     private javax.swing.JLabel jLabelLogoAdaugaFisiere;
     private javax.swing.JLabel jLabelLogoAdaugareUti;
     private javax.swing.JLabel jLabelLogoAdmFisiere;
@@ -2657,14 +3358,22 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelLogoResetParola;
     private javax.swing.JLabel jLabelLogoStergeUti;
     private javax.swing.JLabel jLabelLogoStergereFisere;
+    private javax.swing.JLabel jLabelNr;
+    private javax.swing.JLabel jLabelNrOV;
     private javax.swing.JLabel jLabelNumeAdaugaUti;
     private javax.swing.JLabel jLabelNumeComNoua;
     private javax.swing.JLabel jLabelNumeFisier;
     private javax.swing.JLabel jLabelNumeModCom;
+    private javax.swing.JLabel jLabelNumeSolicitant;
     private javax.swing.JLabel jLabelNumeStergeUti;
     private javax.swing.JLabel jLabelParolaNoua;
+    private javax.swing.JLabel jLabelPersoanaContact;
     private javax.swing.JLabel jLabelSelectUti;
+    private javax.swing.JLabel jLabelSetareParola;
     private javax.swing.JLabel jLabelStergeUtiConf;
+    private javax.swing.JLabel jLabelTensiuneJoasaTensiune;
+    private javax.swing.JLabel jLabelTensiuneMedie;
+    private javax.swing.JLabel jLabelTensiuneMedieTensiune;
     private javax.swing.JLabel jLabelTipFisier;
     private javax.swing.JLabel jLabelTipGenCom;
     private javax.swing.JLabel jLabelTipModCom;
@@ -2674,9 +3383,11 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelTitluAdmUti;
     private javax.swing.JLabel jLabelTitluComNoua;
     private javax.swing.JLabel jLabelTitluMeniuPrincipal;
+    private javax.swing.JLabel jLabelTitluModCom;
     private javax.swing.JLabel jLabelTitluResetParola;
     private javax.swing.JLabel jLabelTitluStergeUti;
     private javax.swing.JLabel jLabelTitluStergereFisiere;
+    private javax.swing.JLabel jLabelTitluVerMet;
     private javax.swing.JLabel jLabelTitluVizCom;
     private javax.swing.JList<String> jListComNoua;
     private javax.swing.JList<String> jListModCom;
@@ -2690,6 +3401,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private javax.swing.JPanel jPanelResetParolaUti;
     private javax.swing.JPanel jPanelStergeUti;
     private javax.swing.JPanel jPanelStergereFisiere;
+    private javax.swing.JPanel jPanelVerMet;
     private javax.swing.JPanel jPanelVizCom;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -2698,21 +3410,34 @@ public class MeniuTaburi extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JComboBox<String> jSelectareUtiResetParola;
     private javax.swing.JTabbedPane jTabbedPaneMeniu;
     private javax.swing.JTable jTableFisiere;
+    private javax.swing.JTable jTableVerMet;
     private javax.swing.JTextArea jTextAreaDescAdaugaFisiere;
     private javax.swing.JTextArea jTextAreaDescComNoua;
     private javax.swing.JTextArea jTextAreaDescModCom;
     private javax.swing.JTextField jTextFieldAdaugaNumeUti;
+    private javax.swing.JTextField jTextFieldAdresa;
+    private javax.swing.JTextField jTextFieldBucJoasaTensiune;
+    private javax.swing.JTextField jTextFieldBucTensiuneJoasaTensiune;
+    private javax.swing.JTextField jTextFieldBucTensiuneMedie;
+    private javax.swing.JTextField jTextFieldBucTensiuneMedieTensiune;
+    private javax.swing.JTextField jTextFieldCodFiscal;
     private javax.swing.JTextField jTextFieldConfParola;
     private javax.swing.JTextField jTextFieldConfResetParola;
     private javax.swing.JTextField jTextFieldConfStergeUti;
+    private javax.swing.JTextField jTextFieldDataVerMet;
+    private javax.swing.JTextField jTextFieldIBAN;
+    private javax.swing.JTextField jTextFieldNrVerMet;
     private javax.swing.JTextField jTextFieldNumeComNoua;
     private javax.swing.JTextField jTextFieldNumeFisier;
     private javax.swing.JTextField jTextFieldNumeModCom;
+    private javax.swing.JTextField jTextFieldNumeSolicitant;
     private javax.swing.JTextField jTextFieldNumeStergeUti;
     private javax.swing.JTextField jTextFieldParolaNouaUti;
+    private javax.swing.JTextField jTextFieldPersoanaContact;
     private javax.swing.JTextField jTextFieldSetareParola;
     private javax.swing.JTextField jTextFieldTipFisier;
     private javax.swing.JTextField jTextFieldTipGenCom;
@@ -2730,6 +3455,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
         jTabbedPaneMeniu.remove(jPanelAdaugaFisiere);
         jTabbedPaneMeniu.remove(jPanelStergereFisiere);
         jTabbedPaneMeniu.remove(jPanelModCom);
+        jTabbedPaneMeniu.remove(jPanelVerMet);
     }
     
     private void incarcaLogo() {
@@ -2742,7 +3468,7 @@ public class MeniuTaburi extends javax.swing.JPanel {
                               new ImageIcon("C:\\Oracle\\Middleware\\Oracle_Home\\jdeveloper\\" +
                                             "mywork\\mywork\\DigitalizareLaboratorMetrologie\\" +
                                             "project\\FisiereDLM\\FisiereAplicatie\\Dsr.png")
-                              .getImage().getScaledInstance(490, 395, Image.SCALE_SMOOTH));
+                              .getImage().getScaledInstance(600, 535, Image.SCALE_SMOOTH));
         ImageIcon logoAdaugaUti = new ImageIcon(
                               new ImageIcon("C:\\Oracle\\Middleware\\Oracle_Home\\jdeveloper\\" +
                                             "mywork\\mywork\\DigitalizareLaboratorMetrologie\\" +
@@ -2792,12 +3518,10 @@ public class MeniuTaburi extends javax.swing.JPanel {
         jFileChooserVizCom.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserVizCom.setControlButtonsAreShown(false);
         jFileChooserVizCom.rescanCurrentDirectory();
-        jFileChooserVizCom.revalidate();
         jFileChooserModCom.setCurrentDirectory(new File(siluriNoi));
         jFileChooserModCom.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserModCom.setControlButtonsAreShown(false);
         jFileChooserModCom.rescanCurrentDirectory();
-        jFileChooserModCom.revalidate();
         jFileChooserAccesFisiere.setCurrentDirectory(javax.swing.filechooser.FileSystemView.getFileSystemView().getHomeDirectory());
         jFileChooserAccesFisiere.setControlButtonsAreShown(false);
     }
@@ -2853,5 +3577,46 @@ public class MeniuTaburi extends javax.swing.JPanel {
             listaSortata.add(modificare);
             }
         return listaSortata;
+    }
+    
+    static void addHeaderAndFooter(PdfDocument doc, Dimension2D pageSize, PdfMargins margin) {
+          PdfPageTemplateElement header = new PdfPageTemplateElement(margin.getLeft(), pageSize.getHeight());
+          doc.getTemplate().setLeft(header);
+          PdfPageTemplateElement topSpace = new PdfPageTemplateElement(pageSize.getWidth(), margin.getTop());
+          topSpace.setForeground(true);
+          doc.getTemplate().setTop(topSpace);
+          //Draw header label
+          PdfTrueTypeFont font = new PdfTrueTypeFont(new Font("Arial",Font.PLAIN,12));
+          PdfStringFormat format = new PdfStringFormat(PdfTextAlignment.Left);
+          String label = "E-iceblue Co.,Ltd";
+          Dimension2D dimension2D = new Dimension();
+          dimension2D.setSize(font.measureString(label, format));
+          float y = topSpace.getHeight() - font.getHeight() - 1;
+          PdfPen pen = new PdfPen(new PdfRGBColor(Color.black), 0.75f);
+          topSpace.getGraphics().setTransparency(0.5f);
+          topSpace.getGraphics().drawLine(pen, margin.getLeft(), y, pageSize.getWidth() - margin.getRight(), y);
+          y = y - 1 - (float) dimension2D.getHeight();
+          topSpace.getGraphics().drawString(label, font, PdfBrushes.getBlack(), margin.getLeft(), y, format);
+          PdfPageTemplateElement rightSpace = new PdfPageTemplateElement(margin.getRight(), pageSize.getHeight());
+          doc.getTemplate().setRight(rightSpace);
+          //Draw dynamic fields as footer
+          PdfPageTemplateElement footer = new PdfPageTemplateElement(pageSize.getWidth(), margin.getBottom());
+          footer.setForeground(true);
+          doc.getTemplate().setBottom(footer);
+          y = font.getHeight() + 1;
+          footer.getGraphics().setTransparency(0.5f);
+          footer.getGraphics().drawLine(pen, margin.getLeft(), y, pageSize.getWidth() - margin.getRight(), y);
+          y = y + 1;
+          PdfPageNumberField pageNumber = new PdfPageNumberField();
+          PdfPageCountField pageCount = new PdfPageCountField();
+          PdfCompositeField pageNumberLabel = new PdfCompositeField();
+          pageNumberLabel.setAutomaticFields(new PdfAutomaticField[]{pageNumber, pageCount});
+          pageNumberLabel.setBrush(PdfBrushes.getBlack());
+          pageNumberLabel.setFont(font);
+          format = new PdfStringFormat(PdfTextAlignment.Right);
+          pageNumberLabel.setStringFormat(format);
+          pageNumberLabel.setText("page {0} of {1}");
+          pageNumberLabel.setBounds(footer.getBounds());
+          pageNumberLabel.draw(footer.getGraphics(), - margin.getLeft(), y);
     }
 }

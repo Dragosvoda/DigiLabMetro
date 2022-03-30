@@ -43,10 +43,18 @@
             <url n="id" path="../../../../../../../Users/Dragos/.jdeveloper/system12.2.1.4.42.190911.2248/o.jdeveloper/JTattoo-1.6.13.library"/>
             <value n="isJDK" v="false"/>
          </hash>
+         <hash>
+            <url n="id" path="../../../../../../../Users/Dragos/.jdeveloper/system12.2.1.4.42.190911.2248/o.jdeveloper/Spire.pdf.free-3.9.01.library"/>
+            <value n="isJDK" v="false"/>
+         </hash>
       </list>
       <list n="modulePathLibraryReferences">
          <hash>
             <url n="id" path="../../../../../../../Users/Dragos/.jdeveloper/system12.2.1.4.42.190911.2248/o.jdeveloper/JTattoo-1.6.13.library"/>
+            <value n="isJDK" v="false"/>
+         </hash>
+         <hash>
+            <url n="id" path="../../../../../../../Users/Dragos/.jdeveloper/system12.2.1.4.42.190911.2248/o.jdeveloper/Spire.pdf.free-3.9.01.library"/>
             <value n="isJDK" v="false"/>
          </hash>
       </list>
