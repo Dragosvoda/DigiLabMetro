@@ -21,6 +21,10 @@ public class Raport {
         this.descriere = descriere;
         this.SIL = SIL;
     }
+    
+    public Raport(int SIL) {
+        this.SIL = SIL;    
+    }
 
     public void setId(int id) {
         this.id = id;

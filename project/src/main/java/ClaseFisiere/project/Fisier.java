@@ -1,5 +1,7 @@
 package ClaseFisiere.project;
 
+import SIL.project.SIL;
+
 public class Fisier {
     private long id;
     private String locatie;
@@ -17,6 +19,11 @@ public class Fisier {
         this.locatie = locatie;
         this.silLink = silLink;
         this.raportLink = raportLink;
+    }
+    
+    public Fisier(String locatie, int silLink) {
+        this.locatie = locatie;
+        this.silLink = silLink;
     }
 
     public Fisier(int id, String path) {

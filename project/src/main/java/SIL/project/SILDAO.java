@@ -19,20 +19,20 @@ public class SILDAO implements GenericDAO<SIL> {
 
     @Override
     public int delete(SIL entity) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Delete from sil where id = ?");
+        PreparedStatement stmt = conn.prepareStatement("Delete from sil where id = ?;");
         stmt.setLong(1,entity.getId());
         return stmt.executeUpdate();
     }
     
     public int stergeDupaNume(String nume) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Delete from sil where nume = ?");
+        PreparedStatement stmt = conn.prepareStatement("Delete from sil where nume = ?;");
         stmt.setString(1, nume);
         return stmt.executeUpdate();
     }
 
     @Override
     public Optional<SIL> get(int id) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Select * From sil where id=?");
+        PreparedStatement stmt = conn.prepareStatement("Select * From sil where id = ?;");
         stmt.setLong(1, id);
         ResultSet rs = stmt.executeQuery();
         if(rs.next()){
@@ -48,7 +48,7 @@ public class SILDAO implements GenericDAO<SIL> {
     }
     
     public SIL getSilDupaNume(String nume) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Select * From sil where nume=?");
+        PreparedStatement stmt = conn.prepareStatement("Select * from sil where nume = ?;");
         stmt.setString(1, nume);
         ResultSet rs = stmt.executeQuery();
         if(rs.next()){
@@ -59,7 +59,7 @@ public class SILDAO implements GenericDAO<SIL> {
             rs.getString("descriere"));
             return sil;
         }
-    else {
+        else {
             return null;
         }  
     } 
@@ -67,7 +67,7 @@ public class SILDAO implements GenericDAO<SIL> {
     @Override
     public List<SIL> getAll() throws SQLException {
         Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * FROM sil");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM sil;");
         while(rs.next()){
             SIL sil = new SIL(
             rs.getInt("id"),
@@ -82,7 +82,7 @@ public class SILDAO implements GenericDAO<SIL> {
     @Override
     public SIL save(SIL entity) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO sil (nume, tip, descriere)\n" +
-                                                        "VALUES (?, ?, ?);",new String[]{"id"});
+                                                        "VALUES (?, ?, ?);", new String[]{"id"});
         stmt.setString(1, entity.getNume());
         stmt.setString(2, entity.getTip());
         stmt.setString(3, entity.getDescriere());
@@ -96,10 +96,11 @@ public class SILDAO implements GenericDAO<SIL> {
 
     @Override
     public int update(SIL entity) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("UPDATE sil SET nume = ?, tip = ?, descriere = ? WHERE id = ? ");
+        PreparedStatement stmt = conn.prepareStatement("UPDATE sil SET nume = ?, tip = ?, descriere = ? WHERE id = ?;");
         stmt.setString(1, entity.getNume());
         stmt.setString(2, entity.getTip());
         stmt.setString(3, entity.getDescriere());
+        stmt.setLong(4, entity.getId());
         return stmt.executeUpdate();
     }
 }

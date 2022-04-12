@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import LayOutManager.project.BorderStyle;
-import LayOutManager.project.Cell;
-import LayOutManager.project.CellStyle;
-import LayOutManager.project.LineStyle;
-import LayOutManager.project.LogicalPage;
-import LayOutManager.project.Padding;
-import LayOutManager.project.PdfLayoutMgr;
-import LayOutManager.project.ScaledJpeg;
-import LayOutManager.project.TextStyle;
-import LayOutManager.project.Coord;
+import com.planbase.pdf.layoutmanager.BorderStyle;
+import com.planbase.pdf.layoutmanager.Cell;
+import com.planbase.pdf.layoutmanager.CellStyle;
+import com.planbase.pdf.layoutmanager.LineStyle;
+import com.planbase.pdf.layoutmanager.LogicalPage;
+import com.planbase.pdf.layoutmanager.Padding;
+import com.planbase.pdf.layoutmanager.PdfLayoutMgr;
+import com.planbase.pdf.layoutmanager.ScaledJpeg;
+import com.planbase.pdf.layoutmanager.TextStyle;
+import com.planbase.pdf.layoutmanager.Coord;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import static LayOutManager.project.CellStyle.Align.*;
+import static com.planbase.pdf.layoutmanager.CellStyle.Align.*;
 import static java.awt.Color.*;
 
 public class TestManualllyPdfLayoutMgr {
@@ -73,17 +73,22 @@ public class TestManualllyPdfLayoutMgr {
 
         // Set up some useful styles for later
         final TextStyle heading = TextStyle.of(PDType1Font.HELVETICA_BOLD, 9.5, WHITE);
-        final CellStyle headingCell = CellStyle.of(BOTTOM_CENTER, textCellPadding, BLUE, BorderStyle.builder()
+        final CellStyle headingCell =
+                CellStyle.of(BOTTOM_CENTER, textCellPadding, BLUE,
+                             BorderStyle.builder()
                                         .left(LineStyle.of(BLUE))
                                         .right(LineStyle.of(WHITE))
                                         .build());
-        final CellStyle headingCellR = CellStyle.of(BOTTOM_CENTER, textCellPadding, BLACK, BorderStyle.builder()
+        final CellStyle headingCellR =
+                CellStyle.of(BOTTOM_CENTER, textCellPadding, BLACK,
+                             BorderStyle.builder()
                                         .left(LineStyle.of(WHITE))
                                         .right(LineStyle.of(BLACK))
                                         .build());
 
         final TextStyle regular = TextStyle.of(PDType1Font.HELVETICA, 9.5, BLACK);
-        final CellStyle regularCell = CellStyle.of(TOP_LEFT, textCellPadding, null, BorderStyle.builder()
+        final CellStyle regularCell = CellStyle.of(TOP_LEFT, textCellPadding, null,
+                                                   BorderStyle.builder()
                                                               .left(LineStyle.of(BLACK))
                                                               .right(LineStyle.of(BLACK))
                                                               .bottom(LineStyle.of(BLACK))
@@ -102,7 +107,8 @@ public class TestManualllyPdfLayoutMgr {
                   .rowBuilder().addTextCells("First", "Second", "Third").buildRow()
                   .buildPart()
                   .partBuilder().cellStyle(CellStyle.of(MIDDLE_CENTER, Padding.of(2),
-                                                        decode("#ccffcc"), BorderStyle.of(DARK_GRAY)))
+                                                        decode("#ccffcc"),
+                                                        BorderStyle.of(DARK_GRAY)))
                   .minRowHeight(120)
                   .textStyle(TextStyle.of(PDType1Font.COURIER, 12, BLACK))
                   .rowBuilder()
@@ -134,7 +140,8 @@ public class TestManualllyPdfLayoutMgr {
                   .rowBuilder().addTextCells("First", "Second", "Third").buildRow()
                   .buildPart()
                   .partBuilder().cellStyle(CellStyle.of(MIDDLE_CENTER, Padding.of(2),
-                                                        decode("#ccffcc"), BorderStyle.of(DARK_GRAY)))
+                                                        decode("#ccffcc"),
+                                                        BorderStyle.of(DARK_GRAY)))
                   .minRowHeight(100)
                   .textStyle(TextStyle.of(PDType1Font.COURIER, 12, BLACK))
                   .rowBuilder()
@@ -163,11 +170,13 @@ public class TestManualllyPdfLayoutMgr {
           .textStyle(TextStyle.of(PDType1Font.COURIER_BOLD_OBLIQUE, 12,
                                   YELLOW.brighter()))
           .partBuilder().cellStyle(CellStyle.of(BOTTOM_CENTER, Padding.of(2),
-                                                decode("#3366cc"), BorderStyle.of(BLACK)))
+                                                decode("#3366cc"),
+                                                BorderStyle.of(BLACK)))
           .rowBuilder().addTextCells("First", "Second", "Third").buildRow()
           .buildPart()
           .partBuilder().cellStyle(CellStyle.of(MIDDLE_CENTER, Padding.of(2),
-                                                decode("#ccffcc"), BorderStyle.of(DARK_GRAY)))
+                                                decode("#ccffcc"),
+                                                BorderStyle.of(DARK_GRAY)))
           .textStyle(TextStyle.of(PDType1Font.COURIER, 12, BLACK))
           .rowBuilder().cellBuilder().align(BOTTOM_RIGHT).addStrs("Line 1").buildCell()
           .cellBuilder().align(BOTTOM_CENTER).addStrs("Line 1", "Line two").buildCell()
@@ -186,17 +195,16 @@ public class TestManualllyPdfLayoutMgr {
         lp.commit();
 
         // Let's do a portrait page now.  I just copied this from the previous page.
-        lp = pageMgr.logicalPageStart(LayOutManager.project
-                                                   .LogicalPage
-                                                   .Orientation
-                                                   .PORTRAIT);
+        lp = pageMgr.logicalPageStart(LogicalPage.Orientation.PORTRAIT);
         lp.tableBuilder(Coord.of(40, lp.yPageTop()))
           .addCellWidths(vec(120.0, 120.0, 120.0))
           .textStyle(TextStyle.of(PDType1Font.COURIER_BOLD_OBLIQUE, 12, YELLOW.brighter()))
-          .partBuilder().cellStyle(CellStyle.of(BOTTOM_CENTER, Padding.of(2), decode("#3366cc"), BorderStyle.of(BLACK)))
+          .partBuilder().cellStyle(CellStyle.of(BOTTOM_CENTER, Padding.of(2), decode("#3366cc"),
+                                                BorderStyle.of(BLACK)))
           .rowBuilder().addTextCells("First", "Second", "Third").buildRow()
           .buildPart()
-          .partBuilder().cellStyle(CellStyle.of(MIDDLE_CENTER, Padding.of(2), decode("#ccffcc"), BorderStyle.of(DARK_GRAY))).minRowHeight(120)
+          .partBuilder().cellStyle(CellStyle.of(MIDDLE_CENTER, Padding.of(2), decode("#ccffcc"),
+                                                BorderStyle.of(DARK_GRAY))).minRowHeight(120)
           .textStyle(TextStyle.of(PDType1Font.COURIER, 12, BLACK))
           .rowBuilder()
           .cellBuilder().align(TOP_LEFT).addStrs("Line 1", "Line two", "Line three").buildCell()
@@ -223,7 +231,8 @@ public class TestManualllyPdfLayoutMgr {
           .textStyle(TextStyle.of(PDType1Font.COURIER_BOLD_OBLIQUE, 12,
                                   YELLOW.brighter()))
           .partBuilder().cellStyle(CellStyle.of(MIDDLE_CENTER, Padding.of(2),
-                                                decode("#3366cc"), BorderStyle.of(BLACK)))
+                                                decode("#3366cc"),
+                                                BorderStyle.of(BLACK)))
           .rowBuilder().addTextCells("Lower-Right").buildRow()
           .buildPart()
           .buildTable();
@@ -313,10 +322,12 @@ public class TestManualllyPdfLayoutMgr {
                                    "Here is a picture with the default and other sizes.  Though" +
                                    " it shows up several times, the image data is only attached" +
                                    " to the file once and reused."))
-                          .addAll(vec(ScaledJpeg.of(melonPic), ScaledJpeg.of(melonPic, 50, 50),
-                                      ScaledJpeg.of(melonPic, 50, 50), ScaledJpeg.of(melonPic, 170, 100)))
+                          .addAll(vec(ScaledJpeg.of(melonPic),
+                                      ScaledJpeg.of(melonPic, 50, 50),
+                                      ScaledJpeg.of(melonPic, 50, 50),
+                                      ScaledJpeg.of(melonPic, 170, 100)))
                           .build(),
-          Cell.builder(regularCell, colWidths[1])
+                      Cell.builder(regularCell, colWidths[1])
                           .add(regular,
                                // Flowing text
                                vec("O say can you see by the dawn's early light, " +
@@ -367,7 +378,7 @@ public class TestManualllyPdfLayoutMgr {
                                    "And the star-spangled banner in triumph shall wave " +
                                    "O'er the land of the free and the home of the brave!"))
                           .build(),
-          Cell.builder(regularCell, colWidths[2])
+                      Cell.builder(regularCell, colWidths[2])
                           .add(regular,
                                vec("Maamme",
                                    null,
@@ -401,7 +412,7 @@ public class TestManualllyPdfLayoutMgr {
                                    "Och högre klinga skall en gång " +
                                    "Vår fosterländska sång."))
                           .build(),
-          Cell.builder(regularCell, colWidths[3])
+                      Cell.builder(regularCell, colWidths[3])
                           .add(regular,
                                vec(// Older first 2 verses obsolete.
                                    "Einigkeit und Recht und Freiheit " +
@@ -414,7 +425,8 @@ public class TestManualllyPdfLayoutMgr {
                                    "  Blühe, deutsches Vaterland!"))
                           .build());
 
-        lp.putRow(pMargin, y, Cell.of(regularCell, colWidths[0], regular, "Another row of cells"),
+        lp.putRow(pMargin, y,
+                  Cell.of(regularCell, colWidths[0], regular, "Another row of cells"),
                   Cell.of(regularCell, colWidths[1], regular, "On the second page"),
                   Cell.of(regularCell, colWidths[2], regular, "Just like any other page"),
                   Cell.of(regularCell, colWidths[3], regular, "That's it!"));

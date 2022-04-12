@@ -72,6 +72,7 @@
    <value n="defaultPackage" v="DSR"/>
    <hash n="oracle.ide.model.TechnologyScopeConfiguration">
       <list n="technologyScope">
+         <string v="Java"/>
          <string v="Maven"/>
       </list>
    </hash>

@@ -19,27 +19,26 @@ public class FisierDAO implements GenericDAO<Fisier> {
 
     @Override
     public int delete(Fisier entity) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Delete from fisiere where id = ?");
-        stmt.setLong(1,entity.getId());
+        PreparedStatement stmt = conn.prepareStatement("Delete from fisiere where id = ?;");
+        stmt.setLong(1, entity.getId());
         return stmt.executeUpdate();
     }
     
     public int deleteBySil(int sil_Id) throws SQLException{
-            PreparedStatement stmt = conn.prepareStatement("Delete from fisiere where silLink = ?");
-            stmt.setLong(1,sil_Id);
+            PreparedStatement stmt = conn.prepareStatement("Delete from fisiere where silLink = ?;");
+            stmt.setLong(1, sil_Id);
             return stmt.executeUpdate();
-        
         }
     
     public int deleteByPath(String path) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Delete from fisiere where locatie = ?");
-        stmt.setString(1,path);
+        PreparedStatement stmt = conn.prepareStatement("Delete from fisiere where locatie = ?;");
+        stmt.setString(1, path);
         return stmt.executeUpdate();
     }
 
     @Override
     public Optional<Fisier> get(int id) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Select * From fisiere where id = ?");
+        PreparedStatement stmt = conn.prepareStatement("Select * From fisiere where id = ?;");
         stmt.setLong(1, id);
         ResultSet rs = stmt.executeQuery();
         if(rs.next()){
@@ -54,7 +53,7 @@ public class FisierDAO implements GenericDAO<Fisier> {
         }
     }
     public List<Fisier> getAllBySil(int silLink) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM fisiere where silLink = ?");
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM fisiere where silLink = ?;");
         stmt.setLong(1, silLink);
         ResultSet rs = stmt.executeQuery();
         while(rs.next()){
@@ -71,7 +70,7 @@ public class FisierDAO implements GenericDAO<Fisier> {
     @Override
     public List<Fisier> getAll() throws SQLException {
         Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * FROM fisiere");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM fisiere;");
         while(rs.next()){
             Fisier f = new Fisier(
             rs.getInt("id"),
@@ -86,10 +85,10 @@ public class FisierDAO implements GenericDAO<Fisier> {
     @Override
     public Fisier save(Fisier entity) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO fisiere (locatie, silLink, raportLink)\n" + 
-                                                       "VALUES (?, ?, ?);",new String[]{"id"});
+                                                       "VALUES (?, ?, ?);", new String[]{"id"});
         stmt.setString(1, entity.getLocatie());
-        stmt.setInt(2,entity.getSilLink());
-        stmt.setInt(3,entity.getRaportLink());
+        stmt.setInt(2, entity.getSilLink());
+        stmt.setInt(3, entity.getRaportLink());
         stmt.executeUpdate();
         ResultSet rs = stmt.getGeneratedKeys();
         if(rs.next()){
@@ -100,10 +99,10 @@ public class FisierDAO implements GenericDAO<Fisier> {
     
     public Fisier saveNou(Fisier entity) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO fisiere (locatie, silLink, raportLink)\n" + 
-                                                       "VALUES (?, ?, ?);",new String[]{"id"});
+                                                       "VALUES (?, ?, ?);", new String[]{"id"});
         stmt.setString(1, entity.getLocatie());
-        stmt.setInt(2,entity.getSilLink());
-        stmt.setInt(3,entity.getRaportLink());
+        stmt.setInt(2, entity.getSilLink());
+        stmt.setInt(3, entity.getRaportLink());
         stmt.executeUpdate();
         ResultSet rs = stmt.getGeneratedKeys();
         if(rs.next()){
@@ -115,10 +114,18 @@ public class FisierDAO implements GenericDAO<Fisier> {
     @Override
     public int update(Fisier entity) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("UPDATE fisiere SET locatie = ?, silLink = ?, " +
-                                                       "raportLink = ? WHERE id = ? ");
+                                                       "raportLink = ? WHERE id = ?;");
         stmt.setString(1, entity.getLocatie());
-        stmt.setInt(2,entity.getSilLink());
-        stmt.setInt(3,entity.getRaportLink()); 
+        stmt.setInt(2, entity.getSilLink());
+        stmt.setInt(3, entity.getRaportLink());
+        stmt.setLong(4, entity.getId());
+        return stmt.executeUpdate();
+    }
+    
+    public int updateRaportLink(Raport entity) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("UPDATE fisiere SET fisiere.Raportlink = " +
+                                                       "(SELECT rapoarte.id FROM rapoarte WHERE rapoarte.id = ?);");
+        stmt.setLong(1, entity.getId());
         return stmt.executeUpdate();
     }
 }

@@ -22,21 +22,21 @@ public class RaportDAO implements GenericDAO<Raport> {
 
     @Override
     public int delete(Raport entity) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Delete from rapoarte where id = ?");
+        PreparedStatement stmt = conn.prepareStatement("Delete from rapoarte where id = ?;");
         stmt.setLong(1, entity.getId());
         return stmt.executeUpdate();
         
     }
     
     public int deleteBySil(int sil_Id) throws SQLException{
-            PreparedStatement stmt = conn.prepareStatement("Delete from rapoarte where SIL = ?");
+            PreparedStatement stmt = conn.prepareStatement("Delete from rapoarte where SIL = ?;");
             stmt.setLong(1, sil_Id);
             return stmt.executeUpdate();
         }
 
     @Override
     public Optional get(int id) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("Select * From rapoarte where id = ?");
+        PreparedStatement stmt = conn.prepareStatement("Select * from rapoarte where id = ?;");
         stmt.setLong(1, id);
         ResultSet rs = stmt.executeQuery();
         if(rs.next()){
@@ -65,11 +65,11 @@ public class RaportDAO implements GenericDAO<Raport> {
             rs.getInt("SIL"));
             rapoarte.add(r);
         }
-           return rapoarte;
+        return rapoarte;
     }
     
     public List<Raport> getAllBySIL(int silLink) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("select * from rapoarte where SIL = ?");
+        PreparedStatement stmt = conn.prepareStatement("select * from rapoarte where SIL = ?;");
         stmt.setLong(1, silLink);
         ResultSet rs = stmt.executeQuery();
         while(rs.next()){
@@ -81,7 +81,7 @@ public class RaportDAO implements GenericDAO<Raport> {
             rs.getInt("SIL"));
             rapoarte.add(r);
         }
-           return rapoarte;
+        return rapoarte;
     }
 
     @Override
@@ -97,13 +97,24 @@ public class RaportDAO implements GenericDAO<Raport> {
         if(rs.next()){
            entity.setId(rs.getInt(1));
         }
-           return entity;
+        return entity;
     }
 
     @Override
     public int update(Raport entity) throws SQLException {
         PreparedStatement stmt = 
-        conn.prepareStatement("UPDATE rapoarte SET nume = ?, tipul = ?, descriere = ?, SIL = ? WHERE id = ? ");
+        conn.prepareStatement("UPDATE rapoarte SET nume = ?, tipul = ?, descriere = ?, SIL = ? WHERE id = ?;");
+        stmt.setString(1, entity.getNume());
+        stmt.setString(2, entity.getTipul());
+        stmt.setString(3, entity.getDescriere());
+        stmt.setInt(4, entity.getSIL());
+        stmt.setLong(5, entity.getId());
+        return stmt.executeUpdate();
+    }
+    
+    public int updateBySIL(Raport entity) throws SQLException {
+        PreparedStatement stmt = 
+        conn.prepareStatement("UPDATE rapoarte SET nume = ?, tipul = ?, descriere = ? WHERE SIL = ?;");
         stmt.setString(1, entity.getNume());
         stmt.setString(2, entity.getTipul());
         stmt.setString(3, entity.getDescriere());

@@ -43,7 +43,7 @@ public class DLMAppStart {
             java.util.logging.Logger.getLogger(DLMAppStart.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         
-        Map<String, String> getUtilizatori = new HashMap<>();
+        /*Map<String, String> getUtilizatori = new HashMap<>();
         System.out.println(getUtilizatori.get("Admin"));
         
         FisierSingleDAO fisiereSingleDB = new FisierSingleDAO(db.getConnection());
@@ -53,7 +53,7 @@ public class DLMAppStart {
             fisiereSingle = fisiereSingleDB.getAll();
         } catch (SQLException ex) {
             java.util.logging.Logger.getLogger(MeniuTaburi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        }*/
     }
     
     private static void createAndShowGUI() {
